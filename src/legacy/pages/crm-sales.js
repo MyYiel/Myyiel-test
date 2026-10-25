@@ -1,0 +1,63 @@
+/* Yiel CRM · Écran 05 pipeline (colonnes glisser-déposer et liste) et Écran 08 agenda et activités (semaine, liste, rappels, Google Calendar). */
+(function () {
+  'use strict';
+  var Y = window.Yiel, U = Y.util, App = window.App, esc = App.esc, A = App.actions, C = Y.CRM;
+  function S() { return App.S; } function cid() { return App.cid(); }
+  function m(n) { return Math.abs(n) >= 1e6 ? (Math.round(n / 1e5) / 10).toLocaleString('fr-FR') + ' M' : U.fmt(n); }
+
+  App.pages['crm-pipeline'] = {
+    after: function () {
+      var drag = null;
+      document.querySelectorAll('.kb-card[draggable]').forEach(function (c) { c.addEventListener('dragstart', function (e) { drag = c.dataset.id; e.dataTransfer.setData('text/plain', drag); c.classList.add('dragging'); }); c.addEventListener('dragend', function () { c.classList.remove('dragging'); }); });
+      document.querySelectorAll('.kb-col').forEach(function (col) {
+        col.addEventListener('dragover', function (e) { e.preventDefault(); col.classList.add('over'); }); col.addEventListener('dragleave', function () { col.classList.remove('over'); });
+        col.addEventListener('drop', function (e) { e.preventDefault(); col.classList.remove('over'); var id = e.dataTransfer.getData('text/plain') || drag, st = col.dataset.stage; if (!id) return; if (st === 'gagne') return A['cc-won']({ dataset: { id: id } }); if (st === 'perdu') return A['cc-lost']({ dataset: { id: id } }); App.run(function () { return C.moveStage(S(), cid(), id, st, { note: 'Déplacée dans le pipeline' }); }, 'Étape mise à jour et historisée.'); });
+      });
+    },
+    render: function () {
+      var tab = App.tab('crm-pipeline', 'colonnes'), d = C.D(S(), cid()), v = App.ui.v, fo = v.ppO || '', fu = v.ppU || '';
+      var opps = C.list(S(), cid(), 'opps').filter(function (o) { return (!fo || o.offer === fo) && (!fu || o.ownerId === fu); }), st = d.settings.stages;
+      var owners = opps.map(function (o) { return o.ownerId; }).filter(function (x, i, a) { return a.indexOf(x) === i; });
+      var h = '<div class="page">' + App.head('Yiel CRM · ventes', 'Pipeline <span class="serif">commercial</span>', 'Glissez une opportunité d’une colonne à l’autre : chaque changement d’étape est historisé et met à jour le cockpit. « Gagné » et « Perdu » demandent les informations fixées par la direction.', App.crmCan('crm.write') ? '<button type="button" class="btn acc" data-act="cc-opp-edit">' + App.ic('plus') + 'Opportunité</button>' : '');
+      h += App.tabs('crm-pipeline', [['colonnes', 'Colonnes'], ['liste', 'Liste', opps.length]], 'colonnes');
+      h += '<div class="ck-filters"><select class="in sel-sm" data-change="ck-f" data-k="ppO"><option value="">Toutes les offres</option>' + C.OFFERS.map(function (o) { return '<option' + (o === fo ? ' selected' : '') + '>' + esc(o) + '</option>'; }).join('') + '</select><select class="in sel-sm" data-change="ck-f" data-k="ppU"><option value="">Tous les responsables</option>' + owners.map(function (o) { return '<option value="' + o + '"' + (o === fu ? ' selected' : '') + '>' + esc(App.uname(o)) + '</option>'; }).join('') + '</select><span class="muted" style="font-size:12.5px">Ouvert : <b>' + m(U.sum(opps.filter(function (o) { return ['gagne', 'perdu'].indexOf(o.stage) < 0; }), function (o) { return o.amount; })) + '</b> · pondéré <b>' + m(U.sum(opps.filter(function (o) { return ['gagne', 'perdu'].indexOf(o.stage) < 0; }), function (o) { return o.amount * o.probability / 100; })) + '</b></span></div>';
+      if (tab === 'colonnes') {
+        h += '<div class="kanban">' + st.map(function (s) { var it = opps.filter(function (o) { return o.stage === s.k; }); return '<section class="kb-col kb-' + s.k + '" data-stage="' + s.k + '"><header><b>' + esc(s.label) + '</b><span>' + it.length + ' · ' + m(U.sum(it, function (o) { return o.amount; })) + '</span></header><div class="kb-list">' + it.map(function (o) { var co = C.company(S(), cid(), o.companyId), na = C.nextAction(S(), cid(), function (a) { return a.oppId === o.id; }), late = na && na.at < C.now(S()); var dr = App.crmCan('crm.write') && C.visible(S(), o) && ['gagne', 'perdu'].indexOf(o.stage) < 0; return '<article class="kb-card' + (late ? ' late' : '') + '"' + (dr ? ' draggable="true"' : '') + ' data-id="' + o.id + '" data-act="cc-opp"><div class="kb-top"><b>' + esc(co.name) + '</b>' + App.uAva(o.ownerId) + '</div><small>' + esc(o.offer) + '</small><div class="kb-fig"><b class="num">' + m(o.amount) + '</b><span>' + o.probability + ' %</span></div>' + (o.stage === 'perdu' ? '<small class="bad-t">' + esc(o.lostReason) + '</small>' : (o.stage === 'gagne' ? '<small class="ok-t">Signée le ' + App.date(o.signedAt) + '</small>' : (na ? '<small class="kb-na' + (late ? ' bad-t' : '') + '">' + App.ic(C.ACT[na.type][1]) + esc(na.title) + ' · ' + esc(na.at.slice(5, 10).split('-').reverse().join('/')) + '</small>' : '<small class="kb-na warn-t">Aucune prochaine action</small>'))) + '</article>'; }).join('') + '</div></section>'; }).join('') + '</div>';
+      } else {
+        h += '<div class="card flush">' + App.table('pp_list', { exportName: 'pipeline', rows: opps.map(function (o) { var co = C.company(S(), cid(), o.companyId); return { id: o.id, o: o, ref: o.ref, co: co.name, offer: o.offer, amount: o.amount, cur: o.currency, prob: o.probability, w: Math.round(o.amount * o.probability / 100), close: o.closeDate, stage: o.stage, owner: App.uname(o.ownerId), country: o.country }; }), rowAct: 'cc-opp', pageSize: 30,
+          cols: [{ k: 'ref', label: 'Réf.', fmt: function (v) { return '<span class="mono">' + esc(v) + '</span>'; } }, { k: 'co', label: 'Entreprise', fmt: function (v) { return '<b>' + esc(v) + '</b>'; } }, { k: 'offer', label: 'Offre' }, { k: 'stage', label: 'Étape', fmt: function (v) { return App.stageChip(v); }, exp: function (r) { return C.stageLabel(S(), cid(), r.stage); } }, { k: 'amount', label: 'Montant', num: true, fmt: function (v, r) { return U.fmt(v) + ' <small class="muted">' + esc(r.cur) + '</small>'; } }, { k: 'prob', label: 'Proba.', num: true, fmt: function (v) { return v + ' %'; } }, { k: 'w', label: 'Pondéré', num: true, fmt: function (v) { return U.fmt(v); } }, { k: 'close', label: 'Clôture', fmt: App.date }, { k: 'owner', label: 'Responsable' }, { k: 'country', label: 'Pays' }] }) + '</div>';
+      }
+      return h + '</div>';
+    }
+  };
+
+  /* ======================================================================= agenda */
+  App.pages['crm-agenda'] = {
+    render: function () {
+      var tab = App.tab('crm-agenda', 'semaine'), d = C.D(S(), cid()), acts = C.list(S(), cid(), 'activities'), now = C.now(S()), g = d.integrations.gcal;
+      var wk = App.ui.v.agW || (function () { var t = new Date(now.slice(0, 10) + 'T12:00:00Z'), k = (t.getUTCDay() + 6) % 7; t.setUTCDate(t.getUTCDate() - k); return t.toISOString().slice(0, 10); })();
+      var rem = C.dueReminders(S(), cid());
+      var h = '<div class="page">' + App.head('Yiel CRM · agenda', 'Agenda <span class="serif">et activités</span>', 'Rendez-vous, appels, tâches et échéances commerciales. Terminer ou reporter une activité met à jour la prochaine action sans effacer l’historique.', App.crmCan('crm.write') ? '<button type="button" class="btn acc" data-act="ag-new">' + App.ic('plus') + 'Activité</button>' : '');
+      h += '<div class="gcal-band ' + (g.status === 'actif' ? 'ok' : 'bad') + '">' + App.ic('cal') + '<span><b>Google Calendar : ' + esc(C.INTEG_STATUS[g.status][0]) + '</b>' + (g.status === 'actif' ? ' · rendez-vous synchronisés (' + esc(g.account) + ')' : ' · synchronisation indisponible, les nouveaux rendez-vous sont signalés « non synchronisés »') + '</span>' + (C.can(S(), 'crm.admin') ? '<button type="button" class="btn xs" data-act="go" data-page="crm-admin" data-tab="integrations">Gérer</button>' : '') + '</div>';
+      if (rem.length) h += '<div class="callout warn">' + App.ic('bell') + '<span><b>Rappel</b> : ' + rem.map(function (a) { return esc(a.title) + ' à ' + a.at.slice(11); }).join(' · ') + '</span></div>';
+      h += App.tabs('crm-agenda', [['semaine', 'Semaine'], ['liste', 'Liste', acts.filter(function (a) { return a.status === 'a_faire' && a.at < now; }).length || null]], 'semaine');
+      if (tab === 'semaine') {
+        var days = [0, 1, 2, 3, 4, 5, 6].map(function (i) { return U.addDays(wk, i); });
+        h += '<div class="ag-nav"><button type="button" class="btn sm" data-act="ag-w" data-d="-7">' + App.ic('back') + 'Semaine précédente</button><b>Semaine du ' + App.date(wk) + '</b><button type="button" class="btn sm" data-act="ag-w" data-d="7">Semaine suivante' + App.ic('next') + '</button><button type="button" class="btn sm ghost" data-act="ag-w" data-d="0">Aujourd’hui</button></div>';
+        h += '<div class="ag-week">' + days.map(function (dd) { var it = acts.filter(function (a) { return a.at.slice(0, 10) === dd && a.status !== 'annule'; }).sort(function (a, b) { return a.at < b.at ? -1 : 1; }); var wd = new Date(dd + 'T12:00:00Z').getUTCDay(); return '<div class="ag-day' + (dd === now.slice(0, 10) ? ' today' : '') + ([0, 6].indexOf(wd) > -1 ? ' we' : '') + '"><header>' + esc(['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'][wd]) + ' <b>' + dd.slice(8) + '</b></header>' + it.map(function (a) { var late = a.status === 'a_faire' && a.at < now; return '<button type="button" class="ag-ev t-' + a.type + (a.status === 'fait' ? ' done' : '') + (late ? ' late' : '') + '" data-act="cc-act" data-id="' + a.id + '"><small>' + a.at.slice(11) + ' · ' + esc(C.ACT[a.type][0]) + (a.gcal ? (a.gcal.sync === 'ok' ? ' · ✓ Google' : ' · ⚠ non synchronisé') : '') + '</small><b>' + esc(a.title) + '</b><span>' + esc(App.uname(a.ownerId)) + '</span></button>'; }).join('') + '</div>'; }).join('') + '</div>';
+      } else {
+        var f = App.v('agF', 'retard'), list = acts.filter(function (a) { if (f === 'retard') return a.status === 'a_faire' && a.at < now; if (f === 'jour') return a.at.slice(0, 10) === now.slice(0, 10); if (f === 'avenir') return a.status === 'a_faire' && a.at >= now; return true; }).sort(function (a, b) { return a.at < b.at ? -1 : 1; });
+        h += '<div class="actions">' + App.filters('agF', [['retard', 'En retard'], ['jour', 'Aujourd’hui'], ['avenir', 'À venir'], ['tout', 'Toutes']], f) + '</div>';
+        h += '<div class="card flush">' + App.table('ag_list', { exportName: 'activites', rows: list.map(function (a) { var c = C.contact(S(), cid(), a.contactId), co = C.company(S(), cid(), a.companyId); return { id: a.id, a: a, at: a.at, type: a.type, title: a.title, who: c ? C.contactName(c) : '', co: co ? co.name : '', owner: App.uname(a.ownerId), status: a.status }; }), rowAct: 'cc-act', emptyTitle: 'Aucune activité',
+          cols: [{ k: 'at', label: 'Date', fmt: function (v, r) { return '<span class="' + (r.status === 'a_faire' && v < now ? 'bad-t' : '') + '">' + esc(v.replace('T', ' ')) + '</span>'; } }, { k: 'type', label: 'Type', fmt: function (v) { return '<span class="chn">' + App.ic(C.ACT[v][1]) + esc(C.ACT[v][0]) + '</span>'; } }, { k: 'title', label: 'Intitulé', fmt: function (v, r) { return '<b>' + esc(v) + '</b>' + (r.a.postponed ? ' <small class="muted">reportée ×' + r.a.postponed + '</small>' : ''); } }, { k: 'who', label: 'Contact' }, { k: 'co', label: 'Entreprise' }, { k: 'owner', label: 'Responsable' }, { k: 'status', label: 'Statut', fmt: function (v) { return App.statusChip(C.ACT_STATUS, v); } }],
+          rowActions: function (r) { return r.status === 'a_faire' && App.crmCan('crm.write') && C.visible(S(), r.a) ? '<button type="button" class="btn xs" data-act="cc-act-done" data-id="' + r.id + '">Terminer</button><button type="button" class="btn xs" data-act="cc-act-postpone" data-id="' + r.id + '">Reporter</button>' : ''; } }) + '</div>';
+      }
+      return h + '</div>';
+    }
+  };
+  A['ag-w'] = function (el) { var d = +el.dataset.d; if (!d) { App.ui.v.agW = null; } else { var cur = App.ui.v.agW || (function () { var t = new Date(C.now(S()).slice(0, 10) + 'T12:00:00Z'), k = (t.getUTCDay() + 6) % 7; t.setUTCDate(t.getUTCDate() - k); return t.toISOString().slice(0, 10); })(); App.ui.v.agW = U.addDays(cur, d); } App.render(); };
+  A['ag-new'] = function () {
+    var cts = C.list(S(), cid(), 'contacts');
+    App.confirm({ title: 'Nouvelle activité', body: 'Choisissez d’abord le contact ou l’entreprise.', fields: [{ k: 'c', label: 'Contact', type: 'select', req: true, empty: '— choisir —', opts: cts.map(function (c) { return [c.id, C.contactName(c) + ' · ' + ((C.company(S(), cid(), c.companyId) || {}).name || '')]; }) }], ok: 'Continuer' }).then(function (v) { if (v) A['cc-act-new']({ dataset: { contact: v.c } }); });
+  };
+})();

@@ -1,0 +1,48 @@
+/* Couche d'interface héritée (rendu par chaînes HTML) : branchée sur le moteur ES (src/core) puis sur la coque React.
+ * L'ordre des imports est l'ordre d'évaluation de l'ancien assemblage (tools/build.py) : kit → coque → écrans → assistante. */
+import '../core/index.js';
+import './logos.js';
+import './kit.js';
+import './app.js';
+import './pages/dashboard.js';
+import './pages/saisie.js';
+import './pages/ventes.js';
+import './pages/achats.js';
+import './pages/banque.js';
+import './pages/immos.js';
+import './pages/livres.js';
+import './pages/analytique.js';
+import './pages/plan.js';
+import './pages/etats.js';
+import './pages/fiscalite.js';
+import './pages/cloture.js';
+import './pages/parametres.js';
+import './pages/imports.js';
+import './pages/paie-common.js';
+import './pages/paie-dashboard.js';
+import './pages/paie-salaries.js';
+import './pages/paie-periode.js';
+import './pages/paie-bulletins.js';
+import './pages/paie-paiements.js';
+import './pages/paie-param.js';
+import './pages/rh-common.js';
+import './pages/gta.js';
+import './pages/abs.js';
+import './pages/moi.js';
+import './pages/stocks.js';
+import './pages/fin-common.js';
+import './pages/tresor.js';
+import './pages/fin-factu.js';
+import './pages/fin-achats.js';
+import './pages/fin-suivi.js';
+import './pages/fin-tiers.js';
+import './pages/fin-fraude.js';
+import './pages/crm-common.js';
+import './pages/crm-cockpit.js';
+import './pages/crm-base.js';
+import './pages/crm-sales.js';
+import './pages/crm-comm.js';
+import './pages/crm-admin.js';
+import './yielina.js';
+
+export default window.App;

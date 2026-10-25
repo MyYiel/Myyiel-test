@@ -1,0 +1,70 @@
+// Parcours de bout en bout du module Paie (Playwright) : node app/tests/e2e/paie-flows.js [dossier-captures]
+const { chromium } = require('playwright');
+const path = require('path');
+(async () => {
+  const shots = process.argv[2];
+  const b = await chromium.launch();
+  const p = await b.newPage({ viewport: { width: 1440, height: 950 } });
+  const errs = [], log = [];
+  p.on('pageerror', e => errs.push('PAGEERROR ' + e.message));
+  p.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|net::/.test(m.text())) errs.push('CONSOLE ' + m.text()); });
+  await p.route(/^https?:\/\/(?!localhost)/, r => r.abort());
+  await p.goto((process.env.BASE_URL || 'http://localhost:3000') + '/');
+  await p.waitForSelector('.rail');
+  await p.evaluate(() => { window.__t = []; const o = App.toast; App.toast = (m, t) => { window.__t.push((t || '') + ': ' + m); o(m, t); }; });
+  const as = (id) => p.evaluate(id => App.actions['switch-user']({ value: id }), id);
+  const ev = (name, fn) => p.evaluate(async fn => { window.__t = []; await eval(fn); await new Promise(r => setTimeout(r, 120)); return window.__t.join(' / ') || '(ok)'; }, fn).then(r => log.push(name + ' → ' + r));
+  const form = (name, act, ds, vals) => p.evaluate(async ([act, ds, vals]) => { window.__t = []; App.actions[act]({ dataset: ds || {} }); await new Promise(r => setTimeout(r, 60)); if (!App._form) return 'NO FORM ' + window.__t.join(' / '); for (const k in vals) { const el = document.getElementById('ff_' + k); if (!el) return 'missing ' + k; if (el.type === 'checkbox') el.checked = !!vals[k]; else el.value = vals[k]; } App.formLive(); App.formSubmit(); await new Promise(r => setTimeout(r, 100)); const e = document.getElementById('ff_err'); return (App._form ? 'FORM ERROR ' + (e ? e.textContent : '') : 'OK') + ' | ' + window.__t.join(' / '); }, [act, ds, vals]).then(r => log.push(name + ' → ' + r));
+  const modal = (name, fn, vals) => p.evaluate(async ([fn, vals]) => { window.__t = []; eval(fn); await new Promise(r => setTimeout(r, 80)); if (!App._modal) return 'NO MODAL ' + window.__t.join(' / '); for (const k in (vals || {})) { const el = document.getElementById(k); if (el) el.value = vals[k]; } App.modalOk(); await new Promise(r => setTimeout(r, 150)); return (App._modal ? 'MODAL OPEN ' + document.getElementById('md_err').textContent : 'OK') + ' | ' + window.__t.join(' / '); }, [fn, vals]).then(r => log.push(name + ' → ' + r));
+  const shot = async (n, page, tab) => { if (!shots) return; await p.evaluate(([pg, t]) => App.go(pg, t), [page, tab]); await p.waitForTimeout(250); await p.screenshot({ path: path.join(shots, n + '.png') }); };
+
+  await shot('01-paie-dashboard', 'paie', 'vue');
+  await as('u5');
+  await form('emp-new', 'emp-new', {}, { nom: 'Mvondo', prenoms: 'Grâce', service: 'Conseil', poste: 'Assistante de mission', sb: '210000', embauche: '2026-10-19', cnps: '1777666-K', modePaiement: 'momo', operateur: 'MTN', momo: '+237 677 99 88 77', categorie: '4' });
+  await ev('variable cell', "(function(){ App.go('paie-periode','variables'); const e = Yiel.Paie.emp(App.S, App.cid(), 'YG0013'); const el = document.querySelector('[data-e=\"'+e.id+'\"][data-c=\"HS1\"]'); el.value='5'; App.actions['pv-cell'](el); })()");
+  await shot('02-variables', 'paie-periode', 'variables');
+  await ev('calcul', "App.actions['pp-calc']()");
+  await shot('03-controle', 'paie-periode', 'controle');
+  await ev('fix CNPS YG0019', "(function(){ const e=Yiel.Paie.emp(App.S,App.cid(),'YG0019'); Yiel.Paie.saveEmployee(App.S,App.cid(),Object.assign({},e,{cnps:'1555444-M'})); App.actions['pp-calc'](); })()");
+  await modal('soumettre', "App.actions['pp-submit']()", { md_c: 'Paie d’octobre prête' });
+  await as('u6');
+  await modal('valider DRH', "App.actions['pp-approve']()", {});
+  await shot('04-workflow', 'paie-periode', 'workflow');
+  await ev('signature pad', "(async function(){ App.go('paie-drh','signature'); await new Promise(r=>setTimeout(r,50)); const c=document.getElementById('sig_pad'); const r=c.getBoundingClientRect(); const fire=(t,x,y)=>c.dispatchEvent(new PointerEvent(t,{clientX:r.left+x,clientY:r.top+y,pointerId:1,bubbles:true})); fire('pointerdown',40,120); for(let i=0;i<60;i++) fire('pointermove',40+i*6,120-Math.sin(i/4)*40); fire('pointerup',400,100); App.actions['sig-save'](); })()");
+  await modal('signer', "App.actions['sig-sign']()", { md_req: 'SIGNER' });
+  await shot('05-signature', 'paie-drh', 'signature');
+  await ev('bulletin view', "(function(){ App.go('paie-bulletins'); const k=App.pk(); const id=Object.keys(Yiel.Paie.D(App.S,App.cid()).periods[k].slips)[0]; App.actions['slip-view']({dataset:{k:k,id:id}}); })()");
+  if (shots) { await p.waitForTimeout(250); await p.screenshot({ path: path.join(shots, '06-bulletin.png') }); }
+  await ev('close', "App.closeDrawer(true)");
+  await as('u5');
+  await form('ordre virement', 'ov-new', {}, {});
+  await ev('soumettre ordre', "(function(){ const o=Yiel.Paie.D(App.S,App.cid()).bankOrders[0]; return Yiel.Paie.orderAction(App.S,App.cid(),o.id,'soumettre'); })()");
+  await as('u6');
+  await ev('valider ordre', "App.actions['ov-do']({dataset:{id:Yiel.Paie.D(App.S,App.cid()).bankOrders[0].id,a:'valider'}})");
+  await as('u5');
+  await modal('envoyer ordre', "App.actions['ov-do']({dataset:{id:Yiel.Paie.D(App.S,App.cid()).bankOrders[0].id,a:'envoyer'}})", { md_c: 'Envoyé au conseiller' });
+  await modal('exécuter ordre', "App.actions['ov-do']({dataset:{id:Yiel.Paie.D(App.S,App.cid()).bankOrders[0].id,a:'executer'}})", {});
+  await ev('close drawer', "App.closeDrawer(true)");
+  await as('u7');
+  for (const c of ['CNPS', 'DGI', 'COMMUNE']) { await modal('télédéclarer ' + c, "App.actions['dc-do']({dataset:{c:'" + c + "',a:'teletransmettre'}})", {}); await modal('payer ' + c, "App.actions['dc-do']({dataset:{c:'" + c + "',a:'payer'}})", {}); }
+  await shot('07-declarations', 'paie-declarations');
+  await modal('clôture DAF', "App.actions['pp-close']()", {});
+  await as('u5');
+  await ev('import salariés exemple', "(function(){ App.go('paie-salaries','import'); App.ui.v.ei=null; App.actions['ei-sample'](); App.actions['ei-analyze'](); })()");
+  await shot('08-import', 'paie-salaries', 'import');
+  await form('demande avance', 'adv-req', {}, { amount: '40000', date: '2026-10-21', reason: 'Santé' });
+  await form('rubrique', 'rub-edit', {}, { code: 'PRIME_SITE', label: 'Prime de site', amount: 'mt("PRIME_SITE")', cond: 'mt("PRIME_SITE") > 0', order: '145' });
+  await form('version param', 'rg-version', { kind: 'param', code: 'SMIG' }, { from: '2027-01-01', value: '45000', reason: 'Simulation de revalorisation' });
+  await ev('yiélina', "(async function(){ App.actions['yl-open']({dataset:{q:'Quelles anomalies bloquent la paie ?'}}); await new Promise(r=>setTimeout(r,200)); })()");
+  await ev('yiélina action', "(async function(){ App.actions['yl-ask']({dataset:{q:'Ajoute 6 heures sup à Fotso'}}); await new Promise(r=>setTimeout(r,200)); if (!App._modal) throw new Error('confirmation Yiélina absente'); App.modalOk(); await new Promise(r=>setTimeout(r,200)); })()");
+  if (shots) { await p.evaluate(() => App.go('paie', 'vue')); await p.waitForTimeout(300); await p.screenshot({ path: path.join(shots, '09-yielina.png') }); }
+  const yl = await p.evaluate(() => App.yl.msgs.map(m => m.role + ': ' + m.text.slice(0, 160)).join('\n'));
+  log.push('YIÉLINA\n' + yl);
+  await as('u4');
+  await ev('lecteur masqué', "(function(){ App.go('paie-salaries','liste'); window.__t.push(document.querySelector('.page').textContent.includes('•••••') ? 'masqué OK' : 'NON MASQUÉ'); })()");
+  const st = await p.evaluate(() => { const P = Yiel.Paie, d = P.D(App.S, App.cid()), k = '2026-10'; return { status: d.periods[k].status, signed: Object.values(d.periods[k].slips).filter(s => s.signed).length, n: Object.keys(d.periods[k].slips).length, order: d.bankOrders[0].status, n422: Yiel.net(App.S, App.cid(), '422', { to: '2026-10-31' }), audit: Yiel.verifyAudit(App.S, App.cid()).ok }; });
+  log.push('ÉTAT ' + JSON.stringify(st));
+  console.log(log.join('\n'));
+  console.log('---ERRORS---\n' + (errs.join('\n') || 'none'));
+  await b.close();
+})();

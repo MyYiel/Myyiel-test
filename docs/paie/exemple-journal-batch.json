@@ -1,0 +1,412 @@
+{
+  "format": "myyiel.journal-batch/1",
+  "company": "co_mvjjfex5_1",
+  "source": {
+    "module": "paie",
+    "ref": "PAIE-2026-09",
+    "generatedAt": "2026-10-22T12:49:11.944Z",
+    "period": "2026-09",
+    "employees": 18
+  },
+  "label": "Paie de septembre 2026",
+  "entries": [
+    {
+      "journal": "PAIE",
+      "kind": "payroll",
+      "date": "2026-09-30",
+      "ref": "PAIE-2026-09",
+      "label": "Paie septembre 2026 · 18 salarié(s)",
+      "lines": [
+        {
+          "account": "641",
+          "label": "Taxes patronales sur salaires (CFC, FNE)",
+          "debit": 88250,
+          "credit": 0,
+          "section": "CNS",
+          "tiers": null
+        },
+        {
+          "account": "641",
+          "label": "Taxes patronales sur salaires (CFC, FNE)",
+          "debit": 105335,
+          "credit": 0,
+          "section": "LOG",
+          "tiers": null
+        },
+        {
+          "account": "641",
+          "label": "Taxes patronales sur salaires (CFC, FNE)",
+          "debit": 122015,
+          "credit": 0,
+          "section": "STR",
+          "tiers": null
+        },
+        {
+          "account": "661",
+          "label": "Rémunérations du personnel",
+          "debit": 3410000,
+          "credit": 0,
+          "section": "CNS",
+          "tiers": null
+        },
+        {
+          "account": "661",
+          "label": "Rémunérations du personnel",
+          "debit": 3794417,
+          "credit": 0,
+          "section": "LOG",
+          "tiers": null
+        },
+        {
+          "account": "661",
+          "label": "Rémunérations du personnel",
+          "debit": 4141060,
+          "credit": 0,
+          "section": "STR",
+          "tiers": null
+        },
+        {
+          "account": "663",
+          "label": "Indemnités et primes forfaitaires",
+          "debit": 290000,
+          "credit": 0,
+          "section": "CNS",
+          "tiers": null
+        },
+        {
+          "account": "663",
+          "label": "Indemnités et primes forfaitaires",
+          "debit": 445000,
+          "credit": 0,
+          "section": "LOG",
+          "tiers": null
+        },
+        {
+          "account": "663",
+          "label": "Indemnités et primes forfaitaires",
+          "debit": 750000,
+          "credit": 0,
+          "section": "STR",
+          "tiers": null
+        },
+        {
+          "account": "664",
+          "label": "Charges sociales patronales CNPS",
+          "debit": 400239,
+          "credit": 0,
+          "section": "CNS",
+          "tiers": null
+        },
+        {
+          "account": "664",
+          "label": "Charges sociales patronales CNPS",
+          "debit": 406244,
+          "credit": 0,
+          "section": "LOG",
+          "tiers": null
+        },
+        {
+          "account": "664",
+          "label": "Charges sociales patronales CNPS",
+          "debit": 387370,
+          "credit": 0,
+          "section": "STR",
+          "tiers": null
+        },
+        {
+          "account": "421",
+          "label": "Avances et prêts retenus",
+          "debit": 0,
+          "credit": 50000,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0004",
+            "name": "MBARGA Alain",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0001",
+          "debit": 0,
+          "credit": 1426052,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0001",
+            "name": "TCHOUMI Paul-Henri",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0002",
+          "debit": 0,
+          "credit": 1266469,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0002",
+            "name": "FOUDA Estelle",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0003",
+          "debit": 0,
+          "credit": 279821,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0003",
+            "name": "NGONO Brigitte",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0004",
+          "debit": 0,
+          "credit": 400784,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0004",
+            "name": "MBARGA Alain",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0005",
+          "debit": 0,
+          "credit": 919275,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0005",
+            "name": "ESSOMBA Jean-Paul",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0006",
+          "debit": 0,
+          "credit": 616730,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0006",
+            "name": "ATANGANA Clarisse",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0007",
+          "debit": 0,
+          "credit": 395539,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0007",
+            "name": "KAMGA Hervé",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0008",
+          "debit": 0,
+          "credit": 355575,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0008",
+            "name": "BELLA Nadège",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0009",
+          "debit": 0,
+          "credit": 1284079,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0009",
+            "name": "NANA Rodrigue",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0010",
+          "debit": 0,
+          "credit": 743694,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0010",
+            "name": "FOTSO Brice",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0011",
+          "debit": 0,
+          "credit": 459000,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0011",
+            "name": "NJOYA Aïcha",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0012",
+          "debit": 0,
+          "credit": 300018,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0012",
+            "name": "ABENA Steve",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0013",
+          "debit": 0,
+          "credit": 435908,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0013",
+            "name": "EKANI Prisca",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0014",
+          "debit": 0,
+          "credit": 167087,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0014",
+            "name": "MOUSSA Ibrahim",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0015",
+          "debit": 0,
+          "credit": 222102,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0015",
+            "name": "ONDOUA Linda",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0016",
+          "debit": 0,
+          "credit": 107136,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0016",
+            "name": "TABI Gaston",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0017",
+          "debit": 0,
+          "credit": 736777,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0017",
+            "name": "MANGA Sandrine",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "422",
+          "label": "Salaire net · YG0018",
+          "debit": 0,
+          "credit": 62489,
+          "section": "",
+          "tiers": {
+            "type": "personnel",
+            "code": "YG0018",
+            "name": "NDONGO Patrick",
+            "collective": "422"
+          }
+        },
+        {
+          "account": "428",
+          "label": "Retenues pour compte de tiers",
+          "debit": 0,
+          "credit": 12500,
+          "section": "",
+          "tiers": null
+        },
+        {
+          "account": "431",
+          "label": "CNPS · part patronale",
+          "debit": 0,
+          "credit": 1193853,
+          "section": "",
+          "tiers": null
+        },
+        {
+          "account": "431",
+          "label": "CNPS · part salariale",
+          "debit": 0,
+          "credit": 364850,
+          "section": "",
+          "tiers": null
+        },
+        {
+          "account": "447",
+          "label": "CFC et FNE patronaux",
+          "debit": 0,
+          "credit": 315600,
+          "section": "",
+          "tiers": null
+        },
+        {
+          "account": "447",
+          "label": "Impôts et taxes retenus sur salaires",
+          "debit": 0,
+          "credit": 2224592,
+          "section": "",
+          "tiers": null
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "debit": 14339930,
+    "credit": 14339930,
+    "lines": 36
+  },
+  "checksum": "ec1d8f36"
+}

@@ -1,0 +1,4 @@
+﻿Code journal;Date (JJ/MM/AAAA);N° de pièce (regroupement);Référence externe;Libellé de l’écriture;Compte;Code tiers;Libellé de ligne;Débit;Crédit;Section analytique;Code TVA
+ACH;05/10/2026;P1;F-2026-0331;Fournitures de bureau;6055;;Fournitures;100000;0;STR;TVA19
+ACH;05/10/2026;P1;F-2026-0331;Fournitures de bureau;4452;;"TVA récupérable 19,25 %";19250;0;;TVA19
+ACH;05/10/2026;P1;F-2026-0331;Fournitures de bureau;4011;F0001;Fournisseur;0;119250;;

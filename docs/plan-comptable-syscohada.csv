@@ -1,0 +1,270 @@
+﻿numero;intitule_fr;intitule_en;classe;sens;nature;lettrable;rapprochable
+10;Capital;Capital;1;C;general;0;0
+101;Capital social;Share capital;1;C;general;0;0
+1011;"Capital souscrit, non appelé";"Subscribed capital, uncalled";1;C;general;0;0
+1012;"Capital souscrit, appelé, non versé";"Subscribed capital, called, unpaid";1;C;general;0;0
+1013;"Capital souscrit, appelé, versé, non amorti";"Subscribed capital, called, paid";1;C;general;0;0
+104;Compte de l’exploitant;Owner’s account;1;C;general;0;0
+105;Primes liées au capital social;Share premiums;1;C;general;0;0
+106;Écarts de réévaluation;Revaluation surplus;1;C;general;0;0
+109;"Apporteurs, capital souscrit, non appelé";"Shareholders, subscribed capital uncalled";1;D;general;0;0
+11;Réserves;Reserves;1;C;general;0;0
+111;Réserve légale;Legal reserve;1;C;general;0;0
+112;Réserves statutaires ou contractuelles;Statutory reserves;1;C;general;0;0
+113;Réserves réglementées;Regulated reserves;1;C;general;0;0
+118;Autres réserves;Other reserves;1;C;general;0;0
+12;Report à nouveau;Retained earnings;1;C;general;0;0
+121;Report à nouveau créditeur;Retained earnings (credit);1;C;general;0;0
+129;Report à nouveau débiteur;Retained earnings (debit);1;D;general;0;0
+13;Résultat net de l’exercice;Net income for the year;1;C;general;0;0
+131;Résultat net : bénéfice;Net income: profit;1;C;general;0;0
+139;Résultat net : perte;Net income: loss;1;D;general;0;0
+14;Subventions d’investissement;Investment grants;1;C;general;0;0
+141;Subventions d’équipement;Equipment grants;1;C;general;0;0
+15;Provisions réglementées et fonds assimilés;Regulated provisions;1;C;general;0;0
+16;Emprunts et dettes assimilées;Borrowings and similar debts;1;C;general;0;0
+161;Emprunts obligataires;Bonds;1;C;general;0;0
+162;Emprunts et dettes auprès des établissements de crédit;Bank loans;1;C;general;0;0
+165;Dépôts et cautionnements reçus;Deposits received;1;C;general;0;0
+166;Intérêts courus;Accrued interest;1;C;general;0;0
+17;Dettes de location-acquisition;Lease-purchase liabilities;1;C;general;0;0
+18;Dettes liées à des participations et comptes de liaison;Liabilities related to participations;1;C;general;0;0
+19;Provisions pour risques et charges;Provisions for risks and charges;1;C;general;0;0
+191;Provisions pour litiges;Provisions for litigation;1;C;general;0;0
+21;Immobilisations incorporelles;Intangible assets;2;D;general;0;0
+211;Frais de développement;Development costs;2;D;general;0;0
+212;"Brevets, licences, concessions et droits similaires";"Patents, licences and similar rights";2;D;general;0;0
+213;Logiciels et sites internet;Software and websites;2;D;general;0;0
+2131;Logiciels;Software;2;D;general;0;0
+2132;Sites internet;Websites;2;D;general;0;0
+215;Fonds commercial;Goodwill;2;D;general;0;0
+22;Terrains;Land;2;D;general;0;0
+23;"Bâtiments, installations techniques et agencements";"Buildings, installations and fittings";2;D;general;0;0
+231;Bâtiments sur sol propre;Buildings on own land;2;D;general;0;0
+234;"Aménagements, agencements et installations techniques";Fixtures and installations;2;D;general;0;0
+24;"Matériel, mobilier et actifs biologiques";"Equipment, furniture and biological assets";2;D;general;0;0
+241;Matériel et outillage industriel et commercial;Industrial equipment and tools;2;D;general;0;0
+244;Matériel et mobilier;Office equipment and furniture;2;D;general;0;0
+2441;Matériel de bureau;Office equipment;2;D;general;0;0
+2442;Matériel informatique;Computer equipment;2;D;general;0;0
+2443;Matériel bureautique;Office automation equipment;2;D;general;0;0
+2444;Mobilier de bureau;Office furniture;2;D;general;0;0
+245;Matériel de transport;Transport equipment;2;D;general;0;0
+25;Avances et acomptes versés sur immobilisations;Advances on fixed assets;2;D;general;0;0
+26;Titres de participation;Equity investments;2;D;general;0;0
+27;Autres immobilisations financières;Other financial assets;2;D;general;0;0
+271;Prêts et créances non commerciales;Non-trade loans;2;D;general;0;0
+272;Prêts au personnel;Loans to staff;2;D;general;0;0
+275;Dépôts et cautionnements versés;Deposits paid;2;D;general;0;0
+28;Amortissements;Depreciation;2;C;general;0;0
+281;Amortissements des immobilisations incorporelles;Amortisation of intangible assets;2;C;general;0;0
+2813;Amortissements des logiciels et sites internet;Amortisation of software and websites;2;C;general;0;0
+283;"Amortissements des bâtiments, installations et agencements";Depreciation of buildings;2;C;general;0;0
+284;Amortissements du matériel;Depreciation of equipment;2;C;general;0;0
+2844;Amortissements du matériel et mobilier;Depreciation of office equipment and furniture;2;C;general;0;0
+2845;Amortissements du matériel de transport;Depreciation of transport equipment;2;C;general;0;0
+29;Dépréciations des immobilisations;Impairment of fixed assets;2;C;general;0;0
+31;Marchandises;Goods for resale;3;D;general;0;0
+311;Marchandises A (matériel et équipements);Goods for resale A;3;D;general;0;0
+32;Matières premières et fournitures liées;Raw materials;3;D;general;0;0
+321;Matières premières;Raw materials;3;D;general;0;0
+33;Autres approvisionnements;Other supplies;3;D;general;0;0
+331;Matières consommables et fournitures;Consumables and supplies;3;D;general;0;0
+34;Produits en cours;Work in progress;3;D;general;0;0
+35;Services en cours;Services in progress;3;D;general;0;0
+36;Produits finis;Finished goods;3;D;general;0;0
+361;Produits finis A;Finished goods A;3;D;general;0;0
+37;Produits intermédiaires et résiduels;Intermediate products;3;D;general;0;0
+38;"Stocks en cours de route, en consignation ou en dépôt";Goods in transit;3;D;general;0;0
+39;Dépréciations des stocks et encours;Inventory impairment;3;C;general;0;0
+3911;Dépréciations des stocks de marchandises;Impairment of goods for resale;3;C;general;0;0
+3921;Dépréciations des stocks de matières premières;Impairment of raw materials;3;C;general;0;0
+3931;Dépréciations des stocks d’autres approvisionnements;Impairment of other supplies;3;C;general;0;0
+3961;Dépréciations des stocks de produits finis;Impairment of finished goods;3;C;general;0;0
+40;Fournisseurs et comptes rattachés;Suppliers and related accounts;4;C;general;0;0
+401;"Fournisseurs, dettes en compte";Trade payables;4;C;tiers;1;0
+4011;Fournisseurs;Suppliers;4;C;tiers;1;0
+402;"Fournisseurs, effets à payer";Bills payable;4;C;tiers;1;0
+408;"Fournisseurs, factures non parvenues";"Suppliers, invoices not yet received";4;C;general;1;0
+409;Fournisseurs débiteurs;Advances to suppliers;4;D;tiers;1;0
+41;Clients et comptes rattachés;Customers and related accounts;4;D;general;0;0
+411;Clients;Trade receivables;4;D;tiers;1;0
+4111;Clients;Customers;4;D;tiers;1;0
+412;"Clients, effets à recevoir en portefeuille";Bills receivable;4;D;tiers;1;0
+416;Créances clients litigieuses ou douteuses;Doubtful receivables;4;D;tiers;1;0
+418;"Clients, produits à recevoir";"Customers, accrued income";4;D;general;1;0
+419;Clients créditeurs;Advances from customers;4;D;tiers;1;0
+42;Personnel;Personnel;4;C;general;0;0
+421;"Personnel, avances et acomptes";Staff advances;4;D;tiers;1;0
+422;"Personnel, rémunérations dues";Salaries payable;4;C;tiers;1;0
+428;"Personnel, charges à payer et produits à recevoir";Staff accruals;4;C;general;1;0
+43;Organismes sociaux;Social security bodies;4;C;general;0;0
+431;Sécurité sociale (CNPS);Social security (CNPS);4;C;general;0;0
+44;État et collectivités publiques;State and public authorities;4;C;general;0;0
+441;"État, impôt sur les bénéfices";"State, income tax";4;D;general;0;0
+442;"État, autres impôts et taxes";"State, other taxes";4;C;general;0;0
+443;"État, TVA facturée";"State, VAT charged";4;C;general;0;0
+4431;TVA facturée sur ventes;VAT charged on sales;4;C;general;0;0
+4432;TVA facturée sur prestations de services;VAT charged on services;4;C;general;0;0
+444;"État, TVA due ou crédit de TVA";"State, VAT payable or credit";4;C;general;0;0
+4441;"État, TVA due";"State, VAT payable";4;C;general;0;0
+4449;"État, crédit de TVA à reporter";VAT credit carried forward;4;D;general;0;0
+445;"État, TVA récupérable";"State, recoverable VAT";4;D;general;0;0
+4451;TVA récupérable sur immobilisations;Recoverable VAT on fixed assets;4;D;general;0;0
+4452;TVA récupérable sur achats;Recoverable VAT on purchases;4;D;general;0;0
+4454;TVA récupérable sur services extérieurs et autres charges;Recoverable VAT on services;4;D;general;0;0
+447;"État, impôts retenus à la source";"State, taxes withheld at source";4;C;general;0;0
+448;"État, charges à payer et produits à recevoir";State accruals;4;C;general;0;0
+449;"État, créances et dettes diverses";"State, other receivables and payables";4;C;general;0;0
+45;Organismes internationaux;International organisations;4;C;general;0;0
+46;"Apporteurs, associés et groupe";"Shareholders, partners and group";4;C;general;0;0
+461;"Apporteurs, opérations sur le capital";"Shareholders, capital transactions";4;C;general;1;0
+462;"Associés, comptes courants";Shareholder current accounts;4;D;tiers;1;0
+465;"Associés, dividendes à payer";"Shareholders, dividends payable";4;C;tiers;1;0
+47;Débiteurs et créditeurs divers;Sundry debtors and creditors;4;C;general;0;0
+471;Comptes d’attente;Suspense accounts;4;C;general;1;0
+476;Charges constatées d’avance;Prepaid expenses;4;D;general;0;0
+477;Produits constatés d’avance;Deferred income;4;C;general;0;0
+478;Écarts de conversion actif;Translation adjustments (assets);4;D;general;0;0
+479;Écarts de conversion passif;Translation adjustments (liabilities);4;C;general;0;0
+48;Créances et dettes hors activités ordinaires;Non-ordinary receivables and payables;4;C;general;0;0
+481;Fournisseurs d’investissements;Fixed asset suppliers;4;C;tiers;1;0
+485;Créances sur cessions d’immobilisations;Receivables on asset disposals;4;D;tiers;1;0
+49;Dépréciations et provisions pour risques à court terme;Short-term impairment and provisions;4;C;general;0;0
+491;Dépréciations des comptes clients;Impairment of trade receivables;4;C;general;0;0
+50;Titres de placement;Marketable securities;5;D;tresorerie;0;0
+51;Valeurs à encaisser;Items for collection;5;D;tresorerie;0;0
+513;Chèques à encaisser;Cheques for collection;5;D;tresorerie;0;0
+52;Banques;Banks;5;D;tresorerie;0;0
+521;Banques locales;Local banks;5;D;tresorerie;0;0
+5211;Banque principale;Main bank;5;D;tresorerie;0;1
+5212;Banque secondaire;Secondary bank;5;D;tresorerie;0;1
+53;Établissements financiers et assimilés;Financial institutions;5;D;tresorerie;0;0
+54;Instruments de trésorerie;Treasury instruments;5;D;tresorerie;0;0
+55;Instruments de monnaie électronique;Electronic money instruments;5;D;tresorerie;0;0
+552;Monnaie électronique · téléphone portable;Mobile money;5;D;tresorerie;0;0
+5521;MTN Mobile Money;MTN Mobile Money;5;D;tresorerie;0;1
+5522;Orange Money;Orange Money;5;D;tresorerie;0;1
+56;"Banques, crédits de trésorerie et d’escompte";Bank overdrafts and discount facilities;5;D;tresorerie;0;0
+561;Crédits de trésorerie;Short-term bank credit;5;D;tresorerie;0;0
+565;Escompte de crédits ordinaires;Discount facilities;5;D;tresorerie;0;0
+57;Caisse;Cash on hand;5;D;tresorerie;0;0
+571;Caisse siège social;Head office cash;5;D;tresorerie;0;0
+5711;Caisse siège · monnaie nationale;Head office cash (XAF);5;D;tresorerie;0;0
+58;"Régies d’avances, accréditifs et virements internes";Imprest and internal transfers;5;D;tresorerie;0;0
+585;Virements de fonds;Internal fund transfers;5;D;tresorerie;0;0
+59;Dépréciations et provisions pour risques à court terme (trésorerie);Impairment of cash items;5;C;tresorerie;0;0
+60;Achats et variations de stocks;Purchases and inventory changes;6;D;general;0;0
+601;Achats de marchandises;Purchases of goods;6;D;general;0;0
+602;Achats de matières premières et fournitures liées;Purchases of raw materials;6;D;general;0;0
+603;Variations des stocks de biens achetés;Change in purchased inventories;6;D;general;0;0
+6031;Variations des stocks de marchandises;Change in goods for resale;6;D;general;0;0
+6032;Variations des stocks de matières premières;Change in raw materials;6;D;general;0;0
+6033;Variations des stocks d’autres approvisionnements;Change in other supplies;6;D;general;0;0
+604;Achats stockés de matières et fournitures consommables;Stored consumables;6;D;general;0;0
+605;Autres achats;Other purchases;6;D;general;0;0
+6051;Fournitures non stockables · eau;Water;6;D;general;0;0
+6052;Fournitures non stockables · électricité;Electricity;6;D;general;0;0
+6053;Fournitures non stockables · autres énergies;Fuel and other energy;6;D;general;0;0
+6054;Fournitures d’entretien non stockables;Maintenance supplies;6;D;general;0;0
+6055;Fournitures de bureau non stockables;Office supplies;6;D;general;0;0
+6056;Achats de petit matériel et outillage;Small equipment;6;D;general;0;0
+608;Achats d’emballages;Packaging;6;D;general;0;0
+61;Transports;Transport;6;D;general;0;0
+612;Transports sur ventes;Outbound transport;6;D;general;0;0
+614;Transports du personnel;Staff transport;6;D;general;0;0
+616;Transports de plis;Courier;6;D;general;0;0
+618;Autres frais de transport;Other transport costs;6;D;general;0;0
+62;Services extérieurs;External services;6;D;general;0;0
+621;Sous-traitance générale;Subcontracting;6;D;general;0;0
+622;Locations et charges locatives;Rentals;6;D;general;0;0
+624;"Entretien, réparations, remise en état et maintenance";Maintenance and repairs;6;D;general;0;0
+625;Primes d’assurance;Insurance premiums;6;D;general;0;0
+626;"Études, recherches et documentation";Studies and documentation;6;D;general;0;0
+627;"Publicité, publications, relations publiques";Advertising and public relations;6;D;general;0;0
+628;Frais de télécommunications;Telecommunications;6;D;general;0;0
+63;Autres services extérieurs;Other external services;6;D;general;0;0
+631;Frais bancaires;Bank charges;6;D;general;0;0
+632;Rémunérations d’intermédiaires et de conseils;Fees and advisory services;6;D;general;0;0
+633;Frais de formation du personnel;Staff training;6;D;general;0;0
+634;"Redevances pour brevets, licences, logiciels et droits similaires";Licence and software fees;6;D;general;0;0
+635;Cotisations;Subscriptions and dues;6;D;general;0;0
+637;Rémunérations de personnel extérieur à l’entreprise;Temporary staff;6;D;general;0;0
+638;Autres charges externes;Other external charges;6;D;general;0;0
+64;Impôts et taxes;Taxes and duties;6;D;general;0;0
+641;Impôts et taxes directs;Direct taxes;6;D;general;0;0
+645;Impôts et taxes indirects;Indirect taxes;6;D;general;0;0
+646;Droits d’enregistrement;Registration duties;6;D;general;0;0
+647;"Pénalités, amendes fiscales";Tax penalties;6;D;general;0;0
+65;Autres charges;Other expenses;6;D;general;0;0
+651;Pertes sur créances clients et autres débiteurs;Bad debts;6;D;general;0;0
+658;Charges diverses;Sundry expenses;6;D;general;0;0
+659;Charges pour dépréciations et provisions à court terme d’exploitation;Short-term operating impairment;6;D;general;0;0
+6594;Charges pour dépréciations sur créances;Impairment of receivables;6;D;general;0;0
+6593;Charges pour dépréciations sur stocks;Impairment of inventories;6;D;general;0;0
+66;Charges de personnel;Personnel expenses;6;D;general;0;0
+661;Rémunérations directes versées au personnel national;"Salaries, national staff";6;D;general;0;0
+662;Rémunérations directes versées au personnel non national;"Salaries, expatriate staff";6;D;general;0;0
+663;Indemnités forfaitaires versées au personnel;Staff allowances;6;D;general;0;0
+664;Charges sociales;Social charges;6;D;general;0;0
+668;Autres charges sociales;Other social charges;6;D;general;0;0
+67;Frais financiers et charges assimilées;Financial expenses;6;D;general;0;0
+671;Intérêts des emprunts;Interest on borrowings;6;D;general;0;0
+674;Autres intérêts;Other interest;6;D;general;0;0
+676;Pertes de change financières;Foreign exchange losses;6;D;general;0;0
+68;Dotations aux amortissements;Depreciation charges;6;D;general;0;0
+681;Dotations aux amortissements d’exploitation;Operating depreciation;6;D;general;0;0
+6812;Dotations aux amortissements des immobilisations incorporelles;Amortisation of intangible assets;6;D;general;0;0
+6813;Dotations aux amortissements des immobilisations corporelles;Depreciation of tangible assets;6;D;general;0;0
+69;Dotations aux provisions et aux dépréciations;Provision and impairment charges;6;D;general;0;0
+691;Dotations aux provisions et dépréciations d’exploitation;Operating provisions;6;D;general;0;0
+70;Ventes;Sales;7;C;general;0;0
+701;Ventes de marchandises;Sales of goods;7;C;general;0;0
+702;Ventes de produits finis;Sales of finished goods;7;C;general;0;0
+705;Travaux facturés;Works invoiced;7;C;general;0;0
+706;Services vendus;Services sold;7;C;general;0;0
+7061;Services vendus · licences logicielles;Services sold · software licences;7;C;general;0;0
+7062;Services vendus · conseil et formation;Services sold · consulting and training;7;C;general;0;0
+7063;Services vendus · prestations logistiques;Services sold · logistics;7;C;general;0;0
+7068;Autres services vendus;Other services sold;7;C;general;0;0
+707;Produits accessoires;Ancillary income;7;C;general;0;0
+71;Subventions d’exploitation;Operating grants;7;C;general;0;0
+72;Production immobilisée;Capitalised production;7;C;general;0;0
+73;Variations des stocks de biens et de services produits;Change in finished goods;7;C;general;0;0
+736;Variations des stocks de produits finis;Change in finished goods inventory;7;C;general;0;0
+75;Autres produits;Other income;7;C;general;0;0
+758;Produits divers;Sundry income;7;C;general;0;0
+759;Reprises de charges pour dépréciations et provisions à court terme d’exploitation;Short-term operating reversals;7;C;general;0;0
+7593;Reprises de charges pour dépréciations sur stocks;Reversal of inventory impairment;7;C;general;0;0
+77;Revenus financiers et produits assimilés;Financial income;7;C;general;0;0
+771;Intérêts de prêts et créances diverses;Interest income;7;C;general;0;0
+776;Gains de change financiers;Foreign exchange gains;7;C;general;0;0
+78;Transferts de charges;Expense transfers;7;C;general;0;0
+781;Transferts de charges d’exploitation;Operating expense transfers;7;C;general;0;0
+79;"Reprises de provisions, de dépréciations et autres";Reversals of provisions;7;C;general;0;0
+791;Reprises de provisions et dépréciations d’exploitation;Operating reversals;7;C;general;0;0
+81;Valeurs comptables des cessions d’immobilisations;Carrying amount of disposed assets;8;D;general;0;0
+811;Immobilisations incorporelles cédées;Disposed intangible assets;8;D;general;0;0
+812;Immobilisations corporelles cédées;Disposed tangible assets;8;D;general;0;0
+82;Produits des cessions d’immobilisations;Proceeds from asset disposals;8;C;general;0;0
+821;Cessions d’immobilisations incorporelles;"Disposal proceeds, intangible";8;C;general;0;0
+822;Cessions d’immobilisations corporelles;"Disposal proceeds, tangible";8;C;general;0;0
+83;Charges hors activités ordinaires;Non-ordinary expenses;8;D;general;0;0
+84;Produits hors activités ordinaires;Non-ordinary income;8;C;general;0;0
+85;Dotations hors activités ordinaires;Non-ordinary provisions;8;D;general;0;0
+86;Reprises hors activités ordinaires;Non-ordinary reversals;8;C;general;0;0
+87;Participation des travailleurs;Employee profit-sharing;8;D;general;0;0
+88;Subventions d’équilibre;Balancing grants;8;C;general;0;0
+89;Impôts sur le résultat;Income taxes;8;D;general;0;0
+891;Impôts sur les bénéfices de l’exercice;Income tax for the year;8;D;general;0;0
+895;Impôt minimum forfaitaire;Minimum tax;8;D;general;0;0
+90;Engagements obtenus et engagements accordés;Commitments received and given;9;;analytique;0;0
+91;Comptes réfléchis;Reflected accounts;9;;analytique;0;0
+92;Comptes de reclassements;Reclassification accounts;9;;analytique;0;0
+93;Comptes de coûts;Cost accounts;9;;analytique;0;0
+94;Comptes de stocks (analytique);Inventory accounts (management);9;;analytique;0;0
+95;Comptes de coûts de revient;Cost price accounts;9;;analytique;0;0
+96;Comptes d’écarts sur coûts préétablis;Standard cost variances;9;;analytique;0;0
+97;Différences de traitement comptable;Accounting treatment differences;9;;analytique;0;0
+98;Comptes de résultats analytiques;Management results;9;;analytique;0;0
+99;Comptes de liaisons internes;Internal liaison accounts;9;;analytique;0;0

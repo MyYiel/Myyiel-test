@@ -1,0 +1,58 @@
+﻿droit;libelle;owner;accountant;reader;payroll;hr;cfo;manager;employee;sales_manager;sales;marketing;crm_admin
+read;"Consulter journaux, livres et états";oui;oui;oui;oui;oui;oui;non;non;non;non;non;non
+draft;Saisir des brouillons;oui;oui;non;non;non;oui;non;non;non;non;non;non
+post;Valider des écritures;oui;oui;non;non;non;oui;non;non;non;non;non;non
+reverse;Contre-passer une écriture;oui;oui;non;non;non;oui;non;non;non;non;non;non
+letter;Lettrer et rapprocher;oui;oui;non;non;non;oui;non;non;non;non;non;non
+invoice;"Émettre devis, factures et avoirs";oui;oui;non;non;non;oui;non;non;non;non;non;non
+bank;Synchroniser et rapprocher la trésorerie;oui;oui;non;non;non;oui;non;non;non;non;non;non
+lock;Verrouiller une période;oui;oui;non;non;non;oui;non;non;non;non;non;non
+reopen;Rouvrir une période ou un exercice;oui;non;non;non;non;oui;non;non;non;non;non;non
+close;Clôturer et générer les à-nouveaux;oui;non;non;non;non;oui;non;non;non;non;non;non
+settings;"Modifier plan, journaux, taxes et paramètres";oui;non;non;non;non;oui;non;non;non;non;non;non
+users;Gérer les utilisateurs et les rôles;oui;non;non;non;non;non;non;non;non;non;non;non
+export;"Exporter (Excel, CSV, PDF, FEC)";oui;oui;oui;oui;oui;oui;non;non;non;non;non;non
+import;Importer des données;oui;oui;non;non;non;oui;non;non;non;non;non;non
+pay.read;Paie : consulter;oui;oui;non;oui;oui;oui;non;non;non;non;non;non
+pay.prepare;"Paie : préparer (salariés, variables, calcul)";oui;non;non;oui;non;non;non;non;non;non;non;non
+pay.validate;Paie : valider et soumettre à la DRH;oui;non;non;oui;non;non;non;non;non;non;non;non
+pay.bank;Paie : préparer et envoyer les ordres de virement;oui;non;non;oui;non;non;non;non;non;non;non;non
+pay.approve;"Paie : valider (DRH) la paie, les virements et les avances";non;non;non;non;oui;non;non;non;non;non;non;non
+pay.sign;Paie : signer électroniquement les bulletins;non;non;non;non;oui;non;non;non;non;non;non;non
+pay.post;Paie : vérifier les écritures et clôturer (DAF);non;non;non;non;non;oui;non;non;non;non;non;non
+pay.declare;Paie : télédéclarer et payer CNPS / DGI (DAF);non;non;non;non;non;oui;non;non;non;non;non;non
+pay.sensitive;"Paie : voir les données sensibles (salaires, RIB, CNI)";oui;non;non;oui;oui;oui;non;non;non;non;non;non
+pay.settings;"Paie : paramétrer rubriques, réglementation, conventions";oui;non;non;oui;non;non;non;non;non;non;non;non
+self;"Accéder à son espace salarié (pointage, demandes, bulletins)";oui;non;non;oui;oui;oui;oui;oui;non;non;non;non
+abs.request;Absences : demander pour soi;non;non;non;oui;oui;oui;oui;oui;non;non;non;non
+abs.read;Absences : consulter le planning de son périmètre;oui;non;non;oui;oui;oui;oui;non;non;non;non;non
+abs.approve;Absences : valider en tant que N+1;non;non;non;non;oui;oui;oui;non;non;non;non;non
+abs.manage;"Absences : saisir pour un salarié, notifier, corriger (gestionnaire)";oui;non;non;oui;non;non;non;non;non;non;non;non
+abs.hr;Absences : valider en tant que DRH;non;non;non;non;oui;non;non;non;non;non;non;non
+abs.settings;"Absences : paramétrer motifs, circuits, jours fériés";oui;non;non;oui;oui;non;non;non;non;non;non;non
+gta.read;Temps : consulter présences et pointages de son périmètre;oui;non;non;oui;oui;oui;oui;non;non;non;non;non
+gta.validate;Temps : valider pointages et feuilles de temps (N+1);non;non;non;non;oui;oui;oui;non;non;non;non;non
+gta.manage;"Temps : paramétrer sites, géozones, horaires, appareils";oui;non;non;oui;oui;non;non;non;non;non;non;non
+gta.track;Temps : voir le suivi des missions en cours;oui;non;non;oui;oui;oui;oui;non;non;non;non;non
+gta.mission;Temps : créer et piloter des ordres de mission;oui;non;non;oui;oui;oui;oui;non;non;non;non;non
+gta.export;Temps : transmettre temps et absences à la paie;oui;non;non;oui;non;non;non;non;non;non;non;non
+stock;"Stocks : articles, mouvements, valorisation";oui;oui;non;non;non;oui;non;non;non;non;non;non
+stock.count;Stocks : inventaires physiques et écritures de stock;oui;oui;non;non;non;oui;non;non;non;non;non;non
+fin.read;"Trésorerie : consulter soldes, prévisions, encaissements et paiements";oui;oui;oui;non;non;oui;non;non;non;non;non;non
+fin.vendor;Tiers : créer et modifier les fiches clients et fournisseurs;oui;oui;non;non;non;oui;non;non;non;non;non;non
+fin.collect;"Encaissements : liens de paiement, justificatifs, relances, rapprochement";oui;oui;non;non;non;oui;non;non;non;non;non;non
+fin.payables;Fournisseurs : traiter les factures reçues et préparer les paiements;oui;oui;non;non;non;oui;non;non;non;non;non;non
+fin.approve;Paiements : approuver (seuils et double validation);oui;non;non;non;non;oui;non;non;non;non;non;non
+fin.pay;Paiements : exécuter les paiements approuvés;oui;non;non;non;non;oui;non;non;non;non;non;non
+fin.verify;"Anti-fraude : confirmer les changements de coordonnées, liste de vigilance";oui;non;non;non;non;oui;non;non;non;non;non;non
+fin.settings;"Trésorerie : paramétrer seuils, modèles de facture, prestataires";oui;non;non;non;non;oui;non;non;non;non;non;non
+crm.read;"CRM : consulter son périmètre (cockpit, contacts, pipeline)";oui;non;non;non;non;oui;non;non;oui;oui;oui;non
+crm.write;"CRM : créer et modifier contacts, entreprises, opportunités, activités";oui;non;non;non;non;non;non;non;oui;oui;oui;non
+crm.all;CRM : voir toutes les données de l’organisation;oui;non;non;non;non;oui;non;non;non;non;non;non
+crm.team;CRM : voir les données de son équipe;non;non;non;non;non;non;non;non;oui;non;non;non
+crm.campaign;"CRM : préparer modèles et campagnes, soumettre à validation";oui;non;non;non;non;non;non;non;oui;non;oui;non
+crm.approve;CRM : valider les campagnes (direction);oui;non;non;non;non;non;non;non;non;non;non;non
+crm.export;CRM : exporter les données de son périmètre;oui;non;non;non;non;non;non;non;oui;non;non;non
+crm.governance;"CRM : fixer plafonds, objectifs, suspension globale";oui;non;non;non;non;non;non;non;non;non;non;non
+crm.personal;CRM : traiter les demandes sur les données personnelles;oui;non;non;non;non;non;non;non;non;non;non;non
+crm.admin;"CRM : administration technique (utilisateurs, intégrations), sans droit commercial";oui;non;non;non;non;non;non;non;non;non;non;oui

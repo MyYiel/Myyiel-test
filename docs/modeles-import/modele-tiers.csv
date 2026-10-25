@@ -1,0 +1,2 @@
+﻿"Type (client, fournisseur, personnel)";Code (vide = automatique);Raison sociale / nom;NIU;RCCM;Régime fiscal;Compte collectif;E-mail;Téléphone;N° Mobile Money;"Opérateur (MTN, Orange)";Adresse;Ville;Délai de paiement (jours);Plafond de crédit (XAF)
+client;;Boulangerie du Littoral SARL;M012345678901A;RC/DLA/2020/B/1234;Réel;4111;compta@client.cm;+237 6 77 00 00 00;+237 6 77 00 00 00;MTN;Akwa;Douala;30;5000000

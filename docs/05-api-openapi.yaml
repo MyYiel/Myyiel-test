@@ -1,0 +1,445 @@
+openapi: 3.1.0
+info:
+  title: myyiel Comptabilité API
+  version: 1.0.0
+  description: |
+    API REST du module de comptabilité SYSCOHADA révisé de myyiel.
+    - Toutes les routes sont préfixées par la société : `/companies/{companyId}/…` ; l'API vérifie l'appartenance (membership) puis positionne `app.company_id` pour la RLS PostgreSQL.
+    - Montants : entiers en francs CFA (XAF/XOF), jamais de décimales.
+    - Écritures : création en brouillon, validation explicite (`POST …/validate`) qui attribue le numéro ; aucune route de modification ou de suppression d'une écriture validée.
+    - Idempotence : en-tête `Idempotency-Key` obligatoire sur toutes les créations (POST) ; conservé 24 h.
+    - Erreurs métier : HTTP 422 avec la liste des règles violées (identifiants RG-… de docs/02).
+    - Droits : indiqués par `x-right` (voir docs/08 et matrice-des-droits.csv).
+servers:
+  - url: https://api.myyiel.com/compta/v1
+security:
+  - oidc: []
+tags:
+  - { name: Référentiels }
+  - { name: Écritures }
+  - { name: Ventes }
+  - { name: Achats }
+  - { name: Trésorerie }
+  - { name: Immobilisations }
+  - { name: Livres et états }
+  - { name: Fiscalité }
+  - { name: Clôture }
+  - { name: Imports et exports }
+  - { name: Administration }
+paths:
+  /companies:
+    get: { tags: [Administration], summary: Sociétés accessibles à l'utilisateur, responses: { '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Company' } } } } } } }
+    post: { tags: [Administration], summary: Créer une société (plan SYSCOHADA, journaux, taxes et exercice initialisés), x-right: users, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Company' } } } }, responses: { '201': { description: Créée } } }
+  /companies/{companyId}/accounts:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    get:
+      tags: [Référentiels]
+      summary: Plan comptable
+      parameters:
+        - { name: class, in: query, schema: { type: integer, minimum: 1, maximum: 9 } }
+        - { name: q, in: query, schema: { type: string } }
+        - { name: lang, in: query, schema: { type: string, enum: [fr, en] } }
+      responses: { '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Account' } } } } } }
+    post: { tags: [Référentiels], summary: Créer un sous-compte (RG-P01, RG-P02), x-right: settings, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Account' } } } }, responses: { '201': { description: Créé }, '422': { $ref: '#/components/responses/BizError' } } }
+  /companies/{companyId}/accounts/{num}:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { name: num, in: path, required: true, schema: { type: string } } ]
+    patch: { tags: [Référentiels], summary: Modifier un compte (renumérotation interdite si mouvementé), x-right: settings, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Account' } } } }, responses: { '200': { description: OK }, '422': { $ref: '#/components/responses/BizError' } } }
+  /companies/{companyId}/third-parties:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    get: { tags: [Référentiels], summary: Tiers, parameters: [ { name: type, in: query, schema: { type: string, enum: [client, fournisseur, personnel, associe] } } ], responses: { '200': { description: OK } } }
+    post: { tags: [Référentiels], summary: Créer un tiers (code automatique si absent), x-right: draft, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/ThirdParty' } } } }, responses: { '201': { description: Créé }, '422': { $ref: '#/components/responses/BizError' } } }
+  /companies/{companyId}/third-parties/{id}/statement:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    get: { tags: [Livres et états], summary: Relevé de compte du tiers (JSON ou PDF selon Accept), responses: { '200': { description: OK } } }
+  /companies/{companyId}/journals:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    get: { tags: [Référentiels], summary: Journaux, responses: { '200': { description: OK } } }
+    post: { tags: [Référentiels], summary: Créer un journal, x-right: settings, responses: { '201': { description: Créé } } }
+  /companies/{companyId}/tax-codes:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    get: { tags: [Référentiels], summary: Codes de taxe, responses: { '200': { description: OK } } }
+    post: { tags: [Référentiels], summary: Créer un code de taxe (principal + CAC = taux), x-right: settings, responses: { '201': { description: Créé } } }
+  /companies/{companyId}/fiscal-years:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    get: { tags: [Clôture], summary: Exercices et périodes, responses: { '200': { description: OK } } }
+    post: { tags: [Clôture], summary: Ouvrir un exercice, x-right: close, responses: { '201': { description: Créé } } }
+  /companies/{companyId}/fiscal-years/{year}/periods/{month}/lock:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/year' }, { name: month, in: path, required: true, schema: { type: integer, minimum: 1, maximum: 12 } } ]
+    post: { tags: [Clôture], summary: Verrouiller une période, x-right: lock, responses: { '200': { description: OK } } }
+    delete: { tags: [Clôture], summary: Rouvrir une période (motif obligatoire), x-right: reopen, requestBody: { required: true, content: { application/json: { schema: { type: object, required: [reason], properties: { reason: { type: string, minLength: 3 } } } } } }, responses: { '200': { description: OK } } }
+
+  /companies/{companyId}/entries:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    get:
+      tags: [Écritures]
+      summary: Rechercher des écritures
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [draft, validated] } }
+        - { name: journal, in: query, schema: { type: string } }
+        - { name: from, in: query, schema: { type: string, format: date } }
+        - { name: to, in: query, schema: { type: string, format: date } }
+        - { name: account, in: query, description: Préfixe de compte, schema: { type: string } }
+        - { name: amount, in: query, schema: { type: integer } }
+        - { name: cursor, in: query, schema: { type: string } }
+      responses: { '200': { description: Page d'écritures, content: { application/json: { schema: { type: object, properties: { items: { type: array, items: { $ref: '#/components/schemas/Entry' } }, next: { type: string } } } } } } }
+    post:
+      tags: [Écritures]
+      summary: Créer un brouillon (ou valider immédiatement avec ?validate=true)
+      x-right: draft
+      parameters: [ { $ref: '#/components/parameters/idem' }, { name: validate, in: query, schema: { type: boolean, default: false } } ]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/EntryInput' } } } }
+      responses: { '201': { description: Créée, content: { application/json: { schema: { $ref: '#/components/schemas/Entry' } } } }, '422': { $ref: '#/components/responses/BizError' } }
+  /companies/{companyId}/entries/{id}:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    get: { tags: [Écritures], summary: Détail, responses: { '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Entry' } } } } } }
+    put: { tags: [Écritures], summary: Modifier un brouillon (409 si validée), x-right: draft, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/EntryInput' } } } }, responses: { '200': { description: OK }, '409': { description: Écriture validée, non modifiable } } }
+    delete: { tags: [Écritures], summary: Supprimer un brouillon (409 si validée), x-right: draft, responses: { '204': { description: Supprimé }, '409': { description: Écriture validée } } }
+  /companies/{companyId}/entries/{id}/validate:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    post: { tags: [Écritures], summary: Valider (contrôles RG-E01 à RG-E11, numérotation), x-right: post, responses: { '200': { description: Validée }, '422': { $ref: '#/components/responses/BizError' } } }
+  /companies/{companyId}/entries/{id}/reverse:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    post: { tags: [Écritures], summary: Contre-passer, x-right: reverse, parameters: [ { $ref: '#/components/parameters/idem' } ], requestBody: { required: true, content: { application/json: { schema: { type: object, required: [date, reason], properties: { date: { type: string, format: date }, reason: { type: string } } } } } }, responses: { '201': { description: Écriture de contre-passation créée } } }
+  /companies/{companyId}/lettering:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    post: { tags: [Écritures], summary: Lettrer des lignes (RG-L01 à L03), x-right: letter, requestBody: { required: true, content: { application/json: { schema: { type: object, required: [lines], properties: { lines: { type: array, minItems: 2, items: { type: string, format: uuid } }, partial: { type: boolean } } } } } }, responses: { '200': { description: Lettre attribuée, content: { application/json: { schema: { type: object, properties: { letter: { type: string } } } } } }, '422': { $ref: '#/components/responses/BizError' } } }
+  /companies/{companyId}/lettering/auto:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    post: { tags: [Écritures], summary: Lettrage automatique d'un compte, x-right: letter, requestBody: { content: { application/json: { schema: { type: object, properties: { account: { type: string } } } } } }, responses: { '200': { description: Nombre de paires lettrées } } }
+  /companies/{companyId}/lettering/{account}/{letter}:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { name: account, in: path, required: true, schema: { type: string } }, { name: letter, in: path, required: true, schema: { type: string } } ]
+    delete: { tags: [Écritures], summary: Délettrer, x-right: letter, responses: { '204': { description: OK } } }
+
+  /companies/{companyId}/sales-documents:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    get: { tags: [Ventes], summary: Devis, factures, avoirs, parameters: [ { name: type, in: query, schema: { type: string, enum: [DV, FA, AV] } }, { name: status, in: query, schema: { type: string } } ], responses: { '200': { description: OK } } }
+    post: { tags: [Ventes], summary: Créer un document en brouillon, x-right: invoice, parameters: [ { $ref: '#/components/parameters/idem' } ], requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/SalesDocument' } } } }, responses: { '201': { description: Créé } } }
+  /companies/{companyId}/sales-documents/{id}/emit:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    post: { tags: [Ventes], summary: Émettre (numérotation FA/AV/DV et écriture VTE), x-right: invoice, responses: { '200': { description: Émis }, '422': { $ref: '#/components/responses/BizError' } } }
+  /companies/{companyId}/sales-documents/{id}/convert:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    post: { tags: [Ventes], summary: Convertir un devis en facture, x-right: invoice, responses: { '201': { description: Facture créée } } }
+  /companies/{companyId}/sales-documents/{id}/credit-note:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    post: { tags: [Ventes], summary: Créer l'avoir d'une facture, x-right: invoice, responses: { '201': { description: Avoir créé } } }
+  /companies/{companyId}/sales-documents/{id}/payments:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    post: { tags: [Ventes], summary: Enregistrer un règlement (écriture de trésorerie, frais, lettrage), x-right: bank, parameters: [ { $ref: '#/components/parameters/idem' } ], requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Payment' } } } }, responses: { '201': { description: Règlement enregistré }, '422': { $ref: '#/components/responses/BizError' } } }
+  /companies/{companyId}/sales-documents/{id}/pdf:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    get: { tags: [Ventes], summary: PDF du document, responses: { '200': { description: PDF, content: { application/pdf: {} } } } }
+  /companies/{companyId}/items:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    get: { tags: [Ventes], summary: Articles, responses: { '200': { description: OK } } }
+    post: { tags: [Ventes], summary: Créer un article, x-right: invoice, responses: { '201': { description: Créé } } }
+
+  /companies/{companyId}/purchases:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    post: { tags: [Achats], summary: Comptabiliser une facture fournisseur (ACH ou IMMO), x-right: post, parameters: [ { $ref: '#/components/parameters/idem' } ], requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/Purchase' } } } }, responses: { '201': { description: Écriture créée } } }
+  /companies/{companyId}/supplier-payments:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    post: { tags: [Achats], summary: Régler un fournisseur (lettrage), x-right: bank, parameters: [ { $ref: '#/components/parameters/idem' } ], responses: { '201': { description: Écriture créée } } }
+
+  /companies/{companyId}/cash-accounts:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    get: { tags: [Trésorerie], summary: Comptes de banque, Mobile Money et caisse, responses: { '200': { description: OK } } }
+    post: { tags: [Trésorerie], summary: Créer un compte de trésorerie (journal créé), x-right: settings, responses: { '201': { description: Créé } } }
+  /companies/{companyId}/cash-accounts/{id}/statements:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    post: { tags: [Trésorerie], summary: Importer des lignes de relevé (dédoublonnées), x-right: import, requestBody: { required: true, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/BankTransactionInput' } } } } }, responses: { '200': { description: Ajoutées / ignorées / erreurs } } }
+  /companies/{companyId}/cash-accounts/{id}/reconciliation:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' }, { name: date, in: query, schema: { type: string, format: date } } ]
+    get: { tags: [Trésorerie], summary: État de rapprochement, responses: { '200': { description: OK } } }
+  /companies/{companyId}/bank-transactions/{id}/match:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    post: { tags: [Trésorerie], summary: Rapprocher avec une ligne comptable (RG-R01), x-right: bank, requestBody: { required: true, content: { application/json: { schema: { type: object, required: [entryLineId], properties: { entryLineId: { type: string, format: uuid } } } } } }, responses: { '200': { description: OK }, '422': { $ref: '#/components/responses/BizError' } } }
+    delete: { tags: [Trésorerie], summary: Annuler le rapprochement, x-right: bank, responses: { '204': { description: OK } } }
+  /companies/{companyId}/bank-transactions/{id}/create-entry:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    post: { tags: [Trésorerie], summary: Créer l'écriture depuis la ligne de relevé et la rapprocher, x-right: bank, responses: { '201': { description: Écriture créée } } }
+  /companies/{companyId}/cash-accounts/{id}/auto-reconcile:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    post: { tags: [Trésorerie], summary: Rapprochement automatique (RG-R03), x-right: bank, responses: { '200': { description: Nombre de rapprochements } } }
+  /companies/{companyId}/transfers:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    post: { tags: [Trésorerie], summary: Virement interne via 585, x-right: bank, parameters: [ { $ref: '#/components/parameters/idem' } ], responses: { '201': { description: Deux écritures créées } } }
+  /companies/{companyId}/cash-counts:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    post: { tags: [Trésorerie], summary: Arrêté de caisse avec billetage, x-right: bank, responses: { '201': { description: Enregistré } } }
+  /webhooks/mobile-money/{provider}:
+    parameters: [ { name: provider, in: path, required: true, schema: { type: string, enum: [mtn, orange] } } ]
+    post:
+      tags: [Trésorerie]
+      summary: Réception des notifications de paiement des opérateurs (signature vérifiée, idempotent par n° de transaction)
+      security: []
+      responses: { '202': { description: Accepté (traitement asynchrone) }, '401': { description: Signature invalide } }
+
+  /companies/{companyId}/fixed-assets:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    get: { tags: [Immobilisations], summary: Registre, responses: { '200': { description: OK } } }
+    post: { tags: [Immobilisations], summary: Inscrire une immobilisation (option comptabilisation de l'acquisition), x-right: post, requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/FixedAsset' } } } }, responses: { '201': { description: Inscrite } } }
+  /companies/{companyId}/fixed-assets/{id}/schedule:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    get: { tags: [Immobilisations], summary: Plan d'amortissement, responses: { '200': { description: OK } } }
+  /companies/{companyId}/fixed-assets/{id}/disposal:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    post: { tags: [Immobilisations], summary: Cession ou mise au rebut, x-right: post, responses: { '201': { description: Écriture IMMO créée } } }
+  /companies/{companyId}/depreciation-runs:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    post: { tags: [Immobilisations], summary: Passer les dotations d'un mois (RG-I03), x-right: post, requestBody: { required: true, content: { application/json: { schema: { type: object, required: [year, month], properties: { year: { type: integer }, month: { type: integer } } } } } }, responses: { '201': { description: Écriture OD créée }, '204': { description: Rien à passer } } }
+
+  /companies/{companyId}/reports/trial-balance:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/yearQ' }, { $ref: '#/components/parameters/toQ' }, { name: level, in: query, schema: { type: string, enum: [detail, '3', '2'] } } ]
+    get: { tags: [Livres et états], summary: Balance 6 colonnes (JSON, XLSX, PDF selon Accept), responses: { '200': { description: OK } } }
+  /companies/{companyId}/reports/general-ledger:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { name: account, in: query, required: true, schema: { type: string } }, { name: from, in: query, schema: { type: string, format: date } }, { $ref: '#/components/parameters/toQ' }, { name: thirdPartyId, in: query, schema: { type: string } } ]
+    get: { tags: [Livres et états], summary: Grand livre avec solde progressif, responses: { '200': { description: OK } } }
+  /companies/{companyId}/reports/aged-balance:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { name: prefix, in: query, required: true, schema: { type: string, enum: ['411', '401'] } }, { name: date, in: query, schema: { type: string, format: date } } ]
+    get: { tags: [Livres et états], summary: Balance âgée, responses: { '200': { description: OK } } }
+  /companies/{companyId}/reports/financial-statements:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/yearQ' }, { $ref: '#/components/parameters/toQ' }, { name: lang, in: query, schema: { type: string, enum: [fr, en] } } ]
+    get: { tags: [Livres et états], summary: Bilan, compte de résultat, TFT (contrôles inclus), responses: { '200': { description: OK } } }
+  /companies/{companyId}/reports/analytic:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { name: from, in: query, schema: { type: string, format: date } }, { $ref: '#/components/parameters/toQ' }, { name: applyKeys, in: query, schema: { type: boolean } } ]
+    get: { tags: [Livres et états], summary: Résultat analytique par section, responses: { '200': { description: OK } } }
+
+  /companies/{companyId}/vat-returns/{year}/{month}:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/year' }, { name: month, in: path, required: true, schema: { type: integer } } ]
+    get: { tags: [Fiscalité], summary: Calcul de la déclaration de TVA, responses: { '200': { description: OK } } }
+  /companies/{companyId}/vat-returns/{year}/{month}/liquidate:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/year' }, { name: month, in: path, required: true, schema: { type: integer } } ]
+    post: { tags: [Fiscalité], summary: Liquider (OD), x-right: post, responses: { '201': { description: Écriture créée }, '422': { $ref: '#/components/responses/BizError' } } }
+  /companies/{companyId}/vat-returns/{year}/{month}/payment:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/year' }, { name: month, in: path, required: true, schema: { type: integer } } ]
+    post: { tags: [Fiscalité], summary: Enregistrer le télépaiement, x-right: bank, responses: { '201': { description: Écriture créée } } }
+  /companies/{companyId}/fec:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { name: from, in: query, required: true, schema: { type: string, format: date } }, { name: to, in: query, required: true, schema: { type: string, format: date } } ]
+    get: { tags: [Fiscalité], summary: Générer le FEC (18 colonnes, text/plain), x-right: export, responses: { '200': { description: Fichier, content: { text/plain: {} } } } }
+
+  /companies/{companyId}/closing/{year}/checks:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/year' } ]
+    get: { tags: [Clôture], summary: Contrôles préalables et score, responses: { '200': { description: OK } } }
+  /companies/{companyId}/closing/{year}/inventory-entries:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/year' } ]
+    post: { tags: [Clôture], summary: Écriture d'inventaire (CCA, PCA, FNP, FAE, DEPC, PROV), x-right: close, responses: { '201': { description: Écriture créée } } }
+  /companies/{companyId}/closing/{year}/income-tax:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/year' } ]
+    get: { tags: [Clôture], summary: Calcul de l'IS, responses: { '200': { description: OK } } }
+    post: { tags: [Clôture], summary: Comptabiliser l'IS, x-right: close, responses: { '201': { description: Écriture créée } } }
+  /companies/{companyId}/closing/{year}/lock:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/year' } ]
+    post: { tags: [Clôture], summary: Verrouiller l'exercice, x-right: close, responses: { '200': { description: OK }, '422': { $ref: '#/components/responses/BizError' } } }
+    delete: { tags: [Clôture], summary: Rouvrir (motif ; impossible après à-nouveaux), x-right: reopen, responses: { '200': { description: OK } } }
+  /companies/{companyId}/closing/{year}/opening-entries:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/year' } ]
+    get: { tags: [Clôture], summary: Aperçu des à-nouveaux, parameters: [ { name: detailTiers, in: query, schema: { type: boolean } } ], responses: { '200': { description: OK } } }
+    post: { tags: [Clôture], summary: Générer les à-nouveaux de N+1 (et extournes), x-right: close, requestBody: { content: { application/json: { schema: { type: object, properties: { detailTiers: { type: boolean }, reverseAccruals: { type: boolean } } } } } }, responses: { '201': { description: Écriture AN créée } } }
+  /companies/{companyId}/closing/{year}/allocation:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/year' } ]
+    post: { tags: [Clôture], summary: Affectation du résultat, x-right: close, requestBody: { required: true, content: { application/json: { schema: { type: object, required: [date, legal, dividends, ran], properties: { date: { type: string, format: date }, legal: { type: integer }, otherReserves: { type: integer }, dividends: { type: integer }, ran: { type: integer } } } } } }, responses: { '201': { description: Écriture créée }, '422': { $ref: '#/components/responses/BizError' } } }
+
+  /companies/{companyId}/imports:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    post:
+      tags: [Imports et exports]
+      summary: Téléverser un fichier d'import (CSV, TXT/FEC, XLSX)
+      x-right: import
+      requestBody: { required: true, content: { multipart/form-data: { schema: { type: object, required: [type, file], properties: { type: { type: string, enum: [accounts, tiers, items, entries, bank, assets, opening] }, file: { type: string, format: binary } } } } } }
+      responses: { '201': { description: Job créé avec la correspondance de colonnes proposée } }
+  /companies/{companyId}/imports/{id}/dry-run:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    post: { tags: [Imports et exports], summary: Contrôle à blanc (transaction annulée), x-right: import, requestBody: { content: { application/json: { schema: { type: object, properties: { mapping: { type: object, additionalProperties: { type: integer } }, options: { type: object } } } } } }, responses: { '200': { description: Valides, rejets, doublons } } }
+  /companies/{companyId}/imports/{id}/run:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { $ref: '#/components/parameters/id' } ]
+    post: { tags: [Imports et exports], summary: Exécuter l'import, x-right: import, responses: { '202': { description: Job lancé } } }
+  /companies/{companyId}/exports/{kind}:
+    parameters: [ { $ref: '#/components/parameters/companyId' }, { name: kind, in: path, required: true, schema: { type: string, enum: [balance, entries, invoices, third-parties, accounts, fixed-assets, audit, statements, backup] } }, { name: format, in: query, schema: { type: string, enum: [xlsx, csv, pdf, json] } } ]
+    post: { tags: [Imports et exports], summary: Lancer un export (fichier signé disponible par URL temporaire), x-right: export, responses: { '202': { description: Job lancé } } }
+
+  /companies/{companyId}/members:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    get: { tags: [Administration], summary: Utilisateurs de la société, x-right: users, responses: { '200': { description: OK } } }
+    post: { tags: [Administration], summary: Inviter un utilisateur, x-right: users, responses: { '201': { description: Invité } } }
+  /companies/{companyId}/audit-events:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    get: { tags: [Administration], summary: Piste d'audit (paginée), responses: { '200': { description: OK } } }
+  /companies/{companyId}/audit-events/verify:
+    parameters: [ { $ref: '#/components/parameters/companyId' } ]
+    post: { tags: [Administration], summary: Vérifier la chaîne d'empreintes, responses: { '200': { description: OK, content: { application/json: { schema: { type: object, properties: { ok: { type: boolean }, brokenAt: { type: [integer, 'null'] } } } } } } } }
+
+components:
+  securitySchemes:
+    oidc: { type: openIdConnect, openIdConnectUrl: https://auth.myyiel.com/.well-known/openid-configuration }
+  parameters:
+    companyId: { name: companyId, in: path, required: true, schema: { type: string, format: uuid } }
+    id: { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    year: { name: year, in: path, required: true, schema: { type: integer } }
+    yearQ: { name: year, in: query, required: true, schema: { type: integer } }
+    toQ: { name: to, in: query, schema: { type: string, format: date } }
+    idem: { name: Idempotency-Key, in: header, required: true, schema: { type: string, maxLength: 80 } }
+  responses:
+    BizError:
+      description: Règles de gestion violées
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code: { type: string, example: BUSINESS_RULE }
+              messages: { type: array, items: { type: string }, example: ['Écriture déséquilibrée : débit 1 000 ≠ crédit 999 (écart 1).'] }
+              rules: { type: array, items: { type: string }, example: [RG-E02] }
+  schemas:
+    Money: { type: integer, format: int64, description: Montant en francs CFA, sans décimales }
+    Company:
+      type: object
+      required: [name]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        name: { type: string }
+        legalForm: { type: string }
+        niu: { type: string }
+        rccm: { type: string }
+        capital: { $ref: '#/components/schemas/Money' }
+        currency: { type: string, enum: [XAF, XOF] }
+        system: { type: string, enum: [normal, smt] }
+        taxRegime: { type: string }
+    Account:
+      type: object
+      required: [num, label]
+      properties:
+        num: { type: string, pattern: '^[1-9][0-9]{1,9}$' }
+        label: { type: string }
+        labelEn: { type: string }
+        class: { type: integer, readOnly: true }
+        sens: { type: string, enum: [D, C] }
+        nature: { type: string, enum: [general, tiers, tresorerie, analytique] }
+        lettrable: { type: boolean }
+        bankReconcile: { type: boolean }
+        analyticRequired: { type: boolean }
+        taxCode: { type: string }
+        active: { type: boolean }
+    ThirdParty:
+      type: object
+      required: [type, name]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        code: { type: string }
+        type: { type: string, enum: [client, fournisseur, personnel, associe] }
+        name: { type: string }
+        collective: { type: string }
+        niu: { type: string, pattern: '^[A-Za-z0-9]{8,20}$' }
+        rccm: { type: string }
+        regime: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        momo: { type: string }
+        momoOp: { type: string, enum: [MTN, Orange] }
+        terms: { type: integer }
+        creditLimit: { $ref: '#/components/schemas/Money' }
+    EntryLineInput:
+      type: object
+      required: [account]
+      properties:
+        account: { type: string }
+        label: { type: string }
+        debit: { $ref: '#/components/schemas/Money' }
+        credit: { $ref: '#/components/schemas/Money' }
+        thirdPartyId: { type: string, format: uuid }
+        section: { type: string }
+        taxCode: { type: string }
+        dueDate: { type: string, format: date }
+    EntryInput:
+      type: object
+      required: [journal, date, label, lines]
+      properties:
+        journal: { type: string }
+        date: { type: string, format: date }
+        pieceDate: { type: string, format: date }
+        ref: { type: string }
+        label: { type: string }
+        lines: { type: array, minItems: 2, items: { $ref: '#/components/schemas/EntryLineInput' } }
+        attachments: { type: array, items: { type: string, format: uuid } }
+    Entry:
+      allOf:
+        - $ref: '#/components/schemas/EntryInput'
+        - type: object
+          properties:
+            id: { type: string, format: uuid }
+            number: { type: string, example: VTE-2026-0042 }
+            status: { type: string, enum: [draft, validated] }
+            source: { type: string }
+            reversalOf: { type: string }
+            reversedBy: { type: string }
+            validatedAt: { type: string, format: date-time }
+            validatedBy: { type: string }
+    SalesDocument:
+      type: object
+      required: [type, thirdPartyId, date, lines]
+      properties:
+        type: { type: string, enum: [DV, FA, AV] }
+        thirdPartyId: { type: string, format: uuid }
+        date: { type: string, format: date }
+        terms: { type: integer }
+        ref: { type: string }
+        section: { type: string }
+        notes: { type: string }
+        lines:
+          type: array
+          items:
+            type: object
+            required: [label, qty, unitPrice]
+            properties:
+              itemCode: { type: string }
+              label: { type: string }
+              qty: { type: number, exclusiveMinimum: 0 }
+              unitPrice: { $ref: '#/components/schemas/Money' }
+              discountPct: { type: number, minimum: 0, maximum: 100 }
+              taxCode: { type: string }
+              account: { type: string }
+              section: { type: string }
+    Payment:
+      type: object
+      required: [date, method, amount]
+      properties:
+        date: { type: string, format: date }
+        method: { type: string, enum: [bank, bank2, momo, om, cash] }
+        amount: { $ref: '#/components/schemas/Money' }
+        fees: { $ref: '#/components/schemas/Money' }
+        extRef: { type: string, description: N° de transaction opérateur ou de virement (unicité) }
+    Purchase:
+      type: object
+      required: [thirdPartyId, date, label, lines]
+      properties:
+        thirdPartyId: { type: string, format: uuid }
+        date: { type: string, format: date }
+        pieceDate: { type: string, format: date }
+        ref: { type: string }
+        label: { type: string }
+        lines: { type: array, items: { type: object, required: [account, ht], properties: { account: { type: string }, ht: { $ref: '#/components/schemas/Money' }, taxCode: { type: string }, section: { type: string } } } }
+    BankTransactionInput:
+      type: object
+      required: [date, label, amount]
+      properties:
+        date: { type: string, format: date }
+        label: { type: string }
+        ref: { type: string }
+        amount: { type: integer, description: Positif = encaissement, négatif = décaissement }
+    FixedAsset:
+      type: object
+      required: [label, account, value, years, serviceDate]
+      properties:
+        label: { type: string }
+        account: { type: string, pattern: '^2[1-5]' }
+        value: { $ref: '#/components/schemas/Money' }
+        residual: { $ref: '#/components/schemas/Money' }
+        acqDate: { type: string, format: date }
+        serviceDate: { type: string, format: date }
+        years: { type: integer, minimum: 1 }
+        method: { type: string, enum: [L, D] }
+        section: { type: string }
+        location: { type: string }
+        supplierId: { type: string, format: uuid }
+        piece: { type: string }
+        withEntry: { type: boolean }
